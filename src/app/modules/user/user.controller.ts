@@ -1,10 +1,14 @@
 import { Request, Response } from 'express';
 import { UserServices } from './user.service';
+import UserValidationSchema from './user.validation';
 
 const createUser = async (req: Request, res: Response) => {
   try {
     const { user: userData } = req.body;
-    const result = await UserServices.createUserIntoDB(userData);
+
+    // Data validation using zod
+    const zodParsedData = UserValidationSchema.parse(userData);
+    const result = await UserServices.createUserIntoDB(zodParsedData);
 
     res.status(200).json({
       success: true,
@@ -12,7 +16,11 @@ const createUser = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: 'Something went wrong',
+      error: error,
+    });
   }
 };
 
@@ -26,7 +34,11 @@ const getAllUsers = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: 'Something went wrong',
+      error: error,
+    });
   }
 };
 
@@ -42,7 +54,11 @@ const getSingleUser = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: 'Something went wrong',
+      error: error,
+    });
   }
 };
 
