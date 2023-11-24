@@ -65,6 +65,7 @@ const userSchema = new Schema<User>({
   email: {
     type: String,
     required: true,
+    unique: true,
   },
   isActive: {
     type: Boolean,
@@ -78,4 +79,4 @@ const userSchema = new Schema<User>({
   orders: [orderSchema],
 });
 
-const User = model<User>('User', userSchema);
+export const UserModel = model<User>('User', userSchema);
