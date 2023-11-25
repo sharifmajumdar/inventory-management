@@ -11,7 +11,7 @@ app.use(cors());
 app.use('/api', UserRoutes);
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Hello world!');
+  res.send('Hello from Sharif!');
 });
 
 export default app;

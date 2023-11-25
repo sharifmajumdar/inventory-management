@@ -2,7 +2,7 @@ import { TUser, TOrder } from './user.iterface';
 import { User } from './user.model';
 
 const createUserIntoDB = async (userData: TUser) => {
-  if (await User.isUserExists(Number(userData.userId))) {
+  if (await User.isUserExists(userData.userId)) {
     throw new Error('User already exists');
   }
 
@@ -31,6 +31,10 @@ const updateUserInDB = async (
   userId: number,
   updatedFields: Partial<TUser>,
 ) => {
+  if (!(await User.isUserExists(userId))) {
+    throw new Error('User is not exists');
+  }
+
   const result = await User.findOneAndUpdate({ userId }, updatedFields, {
     new: true,
   }).select('-password');
@@ -38,6 +42,10 @@ const updateUserInDB = async (
 };
 
 const addOrderIntoDB = async (userId: number, updatedFields: TOrder) => {
+  if (!(await User.isUserExists(userId))) {
+    throw new Error('User is not exists');
+  }
+
   const result = await User.findOneAndUpdate(
     { userId },
     { $push: { orders: updatedFields } },

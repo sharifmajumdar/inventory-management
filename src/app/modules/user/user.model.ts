@@ -3,6 +3,7 @@ import { TAddress, TFullName, TOrder, TUser, UserModel } from './user.iterface';
 import bcrypt from 'bcrypt';
 import config from '../../config';
 
+// Creating fullName schema
 const fullNameSchema = new Schema<TFullName>({
   firstName: {
     type: String,
@@ -10,6 +11,7 @@ const fullNameSchema = new Schema<TFullName>({
     required: true,
     validate: {
       validator: function (value: string) {
+        // Validator used to give a common form (capitalized) for the first name
         const firstNameString = value.charAt(0).toUpperCase() + value.slice(1);
         return firstNameString === value;
       },
@@ -23,6 +25,7 @@ const fullNameSchema = new Schema<TFullName>({
   },
 });
 
+// Creating address schema
 const addressSchema = new Schema<TAddress>({
   street: {
     type: String,
@@ -41,6 +44,7 @@ const addressSchema = new Schema<TAddress>({
   },
 });
 
+// Creating order schema
 const orderSchema = new Schema<TOrder>({
   productName: {
     type: String,
@@ -59,6 +63,7 @@ const orderSchema = new Schema<TOrder>({
   },
 });
 
+// Creating user schema
 const userSchema = new Schema<TUser, UserModel>({
   userId: {
     type: Number,
@@ -124,37 +129,47 @@ const userSchema = new Schema<TUser, UserModel>({
 // Pre save middleware
 userSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(
+    // Bcrypt dependency used to hash the password field
     this.password,
     Number(config.bcrypt_salt_rounds),
   );
   next();
 });
 
+// Post save middleware to clear the password field
 userSchema.post('save', function (doc, next) {
   doc.password = '';
   next();
 });
 
-// Query middleware
+// Pre query middleware for find and skipping the isDeleted field which is true
 userSchema.pre('find', function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
 });
 
+// Pre query middleware for findOne
 userSchema.pre('findOne', function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
 });
 
+// Pre query middleware for update
 userSchema.pre('findOneAndUpdate', function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
 });
 
 // Creating custom static method for data exists
-userSchema.statics.isUserExists = async function (userId: number) {
-  const existingUser = await User.findOne({ userId });
-  return existingUser;
+userSchema.statics.isUserExists = async function (
+  userId: number,
+): Promise<boolean> {
+  try {
+    const user = await this.findOne({ userId }).exec();
+    return user ? true : false;
+  } catch (error) {
+    throw new Error('Data not found!');
+  }
 };
 
 export const User = model<TUser, UserModel>('User', userSchema);
