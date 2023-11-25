@@ -45,10 +45,12 @@ const getAllUsers = async (req: Request, res: Response) => {
     if (error instanceof MongooseError) {
       res.status(500).json({
         success: false,
-        message: error.message || 'Something went wrong',
+        message: error.message || 'User not found',
         error: {
           name: error.name,
           message: error.message,
+          code: 404,
+          description: 'User not found!',
         },
       });
     }
@@ -70,10 +72,66 @@ const getSingleUser = async (req: Request, res: Response) => {
     if (error instanceof MongooseError) {
       res.status(500).json({
         success: false,
-        message: error.message || 'Something went wrong',
+        message: error.message || 'User not found',
         error: {
           name: error.name,
           message: error.message,
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+  }
+};
+
+const getOrders = async (req: Request, res: Response) => {
+  try {
+    const getId = req.params.userId;
+    const userId = parseInt(getId);
+    const result = await UserServices.getOrdersFromDB(userId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Order retrieved successfully',
+      data: result,
+    });
+  } catch (error: unknown) {
+    if (error instanceof MongooseError) {
+      res.status(500).json({
+        success: false,
+        message: error.message || 'User not found',
+        error: {
+          name: error.name,
+          message: error.message,
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+  }
+};
+
+const getTotalPrice = async (req: Request, res: Response) => {
+  try {
+    const getId = req.params.userId;
+    const userId = parseInt(getId);
+    const result = await UserServices.getTotalPriceFromDB(userId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Order retrieved successfully',
+      data: result,
+    });
+  } catch (error: unknown) {
+    if (error instanceof MongooseError) {
+      res.status(500).json({
+        success: false,
+        message: error.message || 'User not found',
+        error: {
+          name: error.name,
+          message: error.message,
+          code: 404,
+          description: 'User not found!',
         },
       });
     }
@@ -96,10 +154,40 @@ const updatedUser = async (req: Request, res: Response) => {
     if (error instanceof MongooseError) {
       res.status(500).json({
         success: false,
-        message: error.message || 'Something went wrong',
+        message: error.message || 'User not found',
         error: {
           name: error.name,
           message: error.message,
+          code: 404,
+          description: 'User not found',
+        },
+      });
+    }
+  }
+};
+
+const addOrders = async (req: Request, res: Response) => {
+  try {
+    const getId = req.params.userId;
+    const userId = parseInt(getId);
+    const { user: userData } = req.body;
+    const result = await UserServices.addOrderIntoDB(userId, userData);
+
+    res.status(200).json({
+      success: true,
+      message: 'Order added successfully',
+      data: result,
+    });
+  } catch (error: unknown) {
+    if (error instanceof MongooseError) {
+      res.status(500).json({
+        success: false,
+        message: error.message || 'User not found',
+        error: {
+          name: error.name,
+          message: error.message,
+          code: 404,
+          description: 'User not found',
         },
       });
     }
@@ -121,10 +209,12 @@ const deleteUser = async (req: Request, res: Response) => {
     if (error instanceof MongooseError) {
       res.status(500).json({
         success: false,
-        message: error.message || 'Something went wrong',
+        message: error.message || 'User not found',
         error: {
           name: error.name,
           message: error.message,
+          code: 404,
+          description: 'User not found!',
         },
       });
     }
@@ -136,5 +226,8 @@ export const UserControllers = {
   getAllUsers,
   getSingleUser,
   updatedUser,
+  addOrders,
+  getOrders,
+  getTotalPrice,
   deleteUser,
 };
