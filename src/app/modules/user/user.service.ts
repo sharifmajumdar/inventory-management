@@ -1,8 +1,10 @@
 import { TUser, TOrder } from './user.iterface';
 import { User } from './user.model';
 
+// Creating a new user into database
 const createUserIntoDB = async (userData: TUser) => {
   if (await User.isUserExists(userData.userId)) {
+    // Checking whether data is already exists
     throw new Error('User already exists');
   }
 
@@ -10,11 +12,13 @@ const createUserIntoDB = async (userData: TUser) => {
   return result;
 };
 
+// Getting all users from database
 const getAllUsersFromDB = async () => {
   const result = await User.find({}, 'username fullName age email address');
   return result;
 };
 
+// Fetching single user from database
 const getSingleUserFromDB = async (userId: number) => {
   if (!(await User.isUserExists(userId))) {
     throw new Error('User is not exists');
@@ -27,6 +31,7 @@ const getSingleUserFromDB = async (userId: number) => {
   return result;
 };
 
+// Update a single user by fetching first
 const updateUserInDB = async (
   userId: number,
   updatedFields: Partial<TUser>,
@@ -41,6 +46,7 @@ const updateUserInDB = async (
   return result;
 };
 
+// Appending a new order into the orders field
 const addOrderIntoDB = async (userId: number, updatedFields: TOrder) => {
   if (!(await User.isUserExists(userId))) {
     throw new Error('User is not exists');
@@ -56,6 +62,7 @@ const addOrderIntoDB = async (userId: number, updatedFields: TOrder) => {
   return result;
 };
 
+// Fetching all orders for a specific user
 const getOrdersFromDB = async (userId: number) => {
   if (!(await User.isUserExists(userId))) {
     throw new Error('User is not exists');
@@ -65,6 +72,7 @@ const getOrdersFromDB = async (userId: number) => {
   return result;
 };
 
+// Calculating total cost for a single user's orders
 const getTotalPriceFromDB = async (userId: number) => {
   if (!(await User.isUserExists(userId))) {
     throw new Error('User is not exists');
@@ -80,6 +88,7 @@ const getTotalPriceFromDB = async (userId: number) => {
   return { totalPrice: totalPrice };
 };
 
+// Deleting a single user from database
 const deleteUserFromDB = async (userId: number) => {
   if (!(await User.isUserExists(userId))) {
     throw new Error('User is not exists');
