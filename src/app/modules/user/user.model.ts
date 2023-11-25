@@ -1,7 +1,9 @@
 import { Schema, model } from 'mongoose';
-import { Address, FullName, Order, User } from './user.iterface';
+import { TAddress, TFullName, TOrder, TUser, UserModel } from './user.iterface';
+import bcrypt from 'bcrypt';
+import config from '../../config';
 
-const fullNameSchema = new Schema<FullName>({
+const fullNameSchema = new Schema<TFullName>({
   firstName: {
     type: String,
     trim: true,
@@ -21,7 +23,7 @@ const fullNameSchema = new Schema<FullName>({
   },
 });
 
-const addressSchema = new Schema<Address>({
+const addressSchema = new Schema<TAddress>({
   street: {
     type: String,
     trim: true,
@@ -39,7 +41,7 @@ const addressSchema = new Schema<Address>({
   },
 });
 
-const orderSchema = new Schema<Order>({
+const orderSchema = new Schema<TOrder>({
   productName: {
     type: String,
     trim: true,
@@ -57,7 +59,7 @@ const orderSchema = new Schema<Order>({
   },
 });
 
-const userSchema = new Schema<User>({
+const userSchema = new Schema<TUser, UserModel>({
   userId: {
     type: Number,
     trim: true,
@@ -113,6 +115,41 @@ const userSchema = new Schema<User>({
     trim: true,
     required: [true, 'Order is required'],
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-export const UserModel = model<User>('User', userSchema);
+// Pre save middleware
+userSchema.pre('save', async function (next) {
+  this.password = await bcrypt.hash(
+    this.password,
+    Number(config.bcrypt_salt_rounds),
+  );
+  next();
+});
+
+userSchema.post('save', function (doc, next) {
+  doc.password = '';
+  next();
+});
+
+// Query middleware
+userSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+userSchema.pre('findOne', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+// Creating custom static method for data exists
+userSchema.statics.isUserExists = async function (userId: number) {
+  const existingUser = await User.findOne({ userId });
+  return existingUser;
+};
+
+export const User = model<TUser, UserModel>('User', userSchema);
