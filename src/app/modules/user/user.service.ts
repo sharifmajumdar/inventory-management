@@ -29,7 +29,7 @@ const updateUserInDB = async (
 ) => {
   const result = await User.findOneAndUpdate({ userId }, updatedFields, {
     new: true,
-  });
+  }).select('-password');
   return result;
 };
 

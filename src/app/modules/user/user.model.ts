@@ -146,6 +146,11 @@ userSchema.pre('findOne', function (next) {
   next();
 });
 
+userSchema.pre('findOneAndUpdate', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
 // Creating custom static method for data exists
 userSchema.statics.isUserExists = async function (userId: number) {
   const existingUser = await User.findOne({ userId });

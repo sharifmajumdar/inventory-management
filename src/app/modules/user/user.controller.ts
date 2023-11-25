@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { UserServices } from './user.service';
 import UserValidationSchema from './user.validation';
 import { Error as MongooseError } from 'mongoose';
+import { User } from './user.model';
 
 const createUser = async (req: Request, res: Response) => {
   try {
@@ -10,11 +11,12 @@ const createUser = async (req: Request, res: Response) => {
     // Data validation using zod
     const zodParsedData = UserValidationSchema.parse(userData);
     const result = await UserServices.createUserIntoDB(zodParsedData);
+    const resData = await User.findById(result._id).select('-password');
 
     res.status(200).json({
       success: true,
       message: 'User is created successfully',
-      data: result,
+      data: resData,
     });
   } catch (error: unknown) {
     if (error instanceof MongooseError) {
