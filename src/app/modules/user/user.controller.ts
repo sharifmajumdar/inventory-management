@@ -78,6 +78,32 @@ const getSingleUser = async (req: Request, res: Response) => {
   }
 };
 
+const updatedUser = async (req: Request, res: Response) => {
+  try {
+    const getId = req.params.userId;
+    const userId = parseInt(getId);
+    const { user: userData } = req.body;
+    const result = await UserServices.updateUserInDB(userId, userData);
+
+    res.status(200).json({
+      success: true,
+      message: 'User is updated successfully',
+      data: result,
+    });
+  } catch (error: unknown) {
+    if (error instanceof MongooseError) {
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Something went wrong',
+        error: {
+          name: error.name,
+          message: error.message,
+        },
+      });
+    }
+  }
+};
+
 const deleteUser = async (req: Request, res: Response) => {
   try {
     const getId = req.params.userId;
@@ -107,5 +133,6 @@ export const UserControllers = {
   createUser,
   getAllUsers,
   getSingleUser,
+  updatedUser,
   deleteUser,
 };

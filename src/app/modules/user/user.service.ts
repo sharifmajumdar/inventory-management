@@ -11,18 +11,25 @@ const createUserIntoDB = async (userData: TUser) => {
 };
 
 const getAllUsersFromDB = async () => {
-  const result = await User.find({
-    username: 1,
-    fullName: 1,
-    age: 1,
-    email: 1,
-    address: 1,
-  });
+  const result = await User.find({}, 'username fullName age email address');
   return result;
 };
 
 const getSingleUserFromDB = async (userId: number) => {
-  const result = await User.findOne({ userId });
+  const result = await User.findOne(
+    { userId },
+    'userId username fullName age email isActive hobbies address',
+  );
+  return result;
+};
+
+const updateUserInDB = async (
+  userId: number,
+  updatedFields: Partial<TUser>,
+) => {
+  const result = await User.findOneAndUpdate({ userId }, updatedFields, {
+    new: true,
+  });
   return result;
 };
 
@@ -35,5 +42,6 @@ export const UserServices = {
   createUserIntoDB,
   getAllUsersFromDB,
   getSingleUserFromDB,
+  updateUserInDB,
   deleteUserFromDB,
 };
