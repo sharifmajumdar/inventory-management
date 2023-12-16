@@ -165,7 +165,7 @@ userSchema.statics.isUserExists = async function (
   userId: number,
 ): Promise<boolean> {
   try {
-    const user = await this.findOne({ userId }).exec();
+    const user = await User.findOne({ userId }).exec();
     return user ? true : false;
   } catch (error) {
     throw new Error('Data not found!');

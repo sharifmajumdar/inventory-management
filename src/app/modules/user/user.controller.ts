@@ -3,11 +3,12 @@ import { UserServices } from './user.service';
 import UserValidationSchema from './user.validation';
 import { Error as MongooseError } from 'mongoose';
 import { User } from './user.model';
+import { TUser } from './user.iterface';
 
 // Creating a new user controller
 const createUser = async (req: Request, res: Response) => {
   try {
-    const { user: userData } = req.body;
+    const userData: TUser = req.body;
 
     // Data validation using zod
     const zodParsedData = UserValidationSchema.parse(userData);
@@ -148,7 +149,7 @@ const updatedUser = async (req: Request, res: Response) => {
   try {
     const getId = req.params.userId;
     const userId = parseInt(getId);
-    const { user: userData } = req.body;
+    const userData = req.body;
     const result = await UserServices.updateUserInDB(userId, userData);
 
     res.status(200).json({
@@ -177,7 +178,7 @@ const addOrders = async (req: Request, res: Response) => {
   try {
     const getId = req.params.userId;
     const userId = parseInt(getId);
-    const { user: userData } = req.body;
+    const userData = req.body;
     const result = await UserServices.addOrderIntoDB(userId, userData);
 
     res.status(200).json({
