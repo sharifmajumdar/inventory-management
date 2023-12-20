@@ -21,9 +21,9 @@ const AddressValidationSchema = z.object({
 });
 
 const OrderValidationSchema = z.object({
-  productName: z.string().min(1).max(100),
-  price: z.number().min(0),
-  quantity: z.number().min(1),
+  productName: z.string().min(1).max(100).optional(),
+  price: z.number().min(0).optional(),
+  quantity: z.number().min(1).optional(),
 });
 
 const UserValidationSchema = z.object({
@@ -36,8 +36,8 @@ const UserValidationSchema = z.object({
   isActive: z.boolean(),
   hobbies: z.array(z.string().min(1)),
   address: AddressValidationSchema,
-  orders: z.array(OrderValidationSchema),
-  isDeleted: z.boolean(),
+  orders: z.array(OrderValidationSchema).optional(),
+  isDeleted: z.boolean().optional(),
 });
 
 export default UserValidationSchema;

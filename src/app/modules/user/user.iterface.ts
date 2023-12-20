@@ -15,9 +15,9 @@ export type TAddress = {
 
 // Creating order type
 export type TOrder = {
-  productName: string;
-  price: number;
-  quantity: number;
+  productName?: string;
+  price?: number;
+  quantity?: number;
 };
 
 // Create a type representing a document in MongoDB
@@ -31,11 +31,17 @@ export type TUser = {
   isActive: boolean;
   hobbies: string[];
   address: TAddress;
-  orders: TOrder[];
-  isDeleted: boolean;
+  orders?: TOrder[];
+  isDeleted?: boolean;
 };
 
 // Creating an iterface for checking existing user using static
-export interface UserModel extends Model<TUser> {
+/* export interface UserModel extends Model<TUser> {
   isUserExists(userId: number): Promise<TUser | null>;
-}
+} */
+
+export type UserMethods = {
+  isUserExists(userId: number): Promise<TUser | null>;
+};
+
+export type UserModel = Model<TUser, Record<number, never>, UserMethods>;
