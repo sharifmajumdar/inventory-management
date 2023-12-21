@@ -26,7 +26,7 @@ const getSingleUserFromDB = async (userId: number) => {
   /*   if (!(await User.isUserExists(userId))) {
     throw new Error('User is not exists');
   } */
-  const user = new User();
+  const user = new User(userId);
   if (!(await user.isUserExists(userId))) {
     throw new Error('User is not exists!');
   }
@@ -43,7 +43,7 @@ const updateUserInDB = async (
   userId: number,
   updatedFields: Partial<TUser>,
 ) => {
-  const user = new User();
+  const user = new User(userId);
   if (!(await user.isUserExists(userId))) {
     throw new Error('User is not exists!');
   }
@@ -56,7 +56,7 @@ const updateUserInDB = async (
 
 // Appending a new order into the orders field
 const addOrderIntoDB = async (userId: number, updatedFields: TOrder) => {
-  const user = new User();
+  const user = new User(userId);
   if (!(await user.isUserExists(userId))) {
     throw new Error('User is not exists!');
   }
@@ -73,7 +73,7 @@ const addOrderIntoDB = async (userId: number, updatedFields: TOrder) => {
 
 // Fetching all orders for a specific user
 const getOrdersFromDB = async (userId: number) => {
-  const user = new User();
+  const user = new User(userId);
   if (!(await user.isUserExists(userId))) {
     throw new Error('User is not exists!');
   }
@@ -84,7 +84,7 @@ const getOrdersFromDB = async (userId: number) => {
 
 // Calculating total cost for a single user's orders
 const getTotalPriceFromDB = async (userId: number) => {
-  const user = new User();
+  const user = new User(userId);
   if (!(await user.isUserExists(userId))) {
     throw new Error('User is not exists!');
   }
@@ -104,7 +104,7 @@ const getTotalPriceFromDB = async (userId: number) => {
 
 // Deleting a single user from database
 const deleteUserFromDB = async (userId: number) => {
-  const user = new User();
+  const user = new User(userId);
   if (!(await user.isUserExists(userId))) {
     throw new Error('User is not exists!');
   }
