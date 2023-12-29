@@ -1,6 +1,6 @@
 ## Online invetory store
 
-An online based inventory management system (backend) where the aim was to design a sample CRUD operation APIs with proper validation.
+A online based inventory management system (backend) where the aim was to design a sample CRUD operation APIs with proper validation.
 
 # Technology used
 
