@@ -1,12 +1,5 @@
 import { Schema, model } from 'mongoose';
-import {
-  TAddress,
-  TFullName,
-  TOrder,
-  TUser,
-  UserMethods,
-  UserModel,
-} from './user.iterface';
+import { TAddress, TFullName, TOrder, TUser, UserModel } from './user.iterface';
 import bcrypt from 'bcrypt';
 import config from '../../config';
 
@@ -68,7 +61,7 @@ const orderSchema = new Schema<TOrder>({
 });
 
 // Creating user schema
-const userSchema = new Schema<TUser, UserModel, UserMethods>({
+const userSchema = new Schema<TUser, UserModel>({
   userId: {
     type: Number,
     trim: true,
@@ -173,13 +166,30 @@ userSchema.pre('findOneAndUpdate', function (next) {
   } catch (error) {
     throw new Error('Data not found!');
   }
+};
+ */
+/* userSchema.statics.isUserExists = async function (userId: number) {
+  const existingUser = await User.findOne({ userId });
+  return existingUser;
 }; */
 
+userSchema.static(
+  'isUserExists',
+  async function isUserExists(userId: number): Promise<boolean> {
+    try {
+      const existingUser = await User.findOne({ userId }).exec();
+      return !!existingUser;
+    } catch (error) {
+      throw new Error('Error checking user existence');
+    }
+  },
+);
+
 //creating a custom instance method
-userSchema.methods.isUserExists = async function (id: number) {
+/* userSchema.methods.isUserExists = async function (id: number) {
   const existingUser = await User.findOne({ id });
 
   return existingUser;
-};
+}; */
 
 export const User = model<TUser, UserModel>('User', userSchema);

@@ -3,14 +3,14 @@ import { User } from './user.model';
 
 // Creating a new user into database
 const createUserIntoDB = async (userData: TUser) => {
-  const user = new User(userData);
-  if (await user.isUserExists(userData.userId)) {
+  // Checking whether data is already exists
+  const userExists = await User.isUserExists(userData.userId);
+
+  if (userExists) {
+    console.log('Data is already there!!!');
     throw new Error('User already exists!');
   }
-  /*   if (await User.isUserExists(userData.userId)) {
-    // Checking whether data is already exists
-    throw new Error('User already exists!');
-  } */
+
   const result = await User.create(userData);
   return result;
 };
@@ -26,10 +26,11 @@ const getSingleUserFromDB = async (userId: number) => {
   /*   if (!(await User.isUserExists(userId))) {
     throw new Error('User is not exists');
   } */
-  const user = new User(userId);
+
+  /*   const user = new User(userId);
   if (!(await user.isUserExists(userId))) {
     throw new Error('User is not exists!');
-  }
+  } */
 
   const result = await User.findOne(
     { userId },
@@ -43,10 +44,10 @@ const updateUserInDB = async (
   userId: number,
   updatedFields: Partial<TUser>,
 ) => {
-  const user = new User(userId);
+  /*   const user = new User(userId);
   if (!(await user.isUserExists(userId))) {
     throw new Error('User is not exists!');
-  }
+  } */
 
   const result = await User.findOneAndUpdate({ userId }, updatedFields, {
     new: true,
@@ -54,12 +55,23 @@ const updateUserInDB = async (
   return result;
 };
 
-// Appending a new order into the orders field
-const addOrderIntoDB = async (userId: number, updatedFields: TOrder) => {
-  const user = new User(userId);
+// Deleting a single user from database
+const deleteUserFromDB = async (userId: number) => {
+  /*   const user = new User(userId);
   if (!(await user.isUserExists(userId))) {
     throw new Error('User is not exists!');
-  }
+  } */
+
+  const result = await User.updateOne({ userId }, { isDeleted: true });
+  return result;
+};
+
+// Appending a new order into the orders field
+const addOrderIntoDB = async (userId: number, updatedFields: TOrder) => {
+  /*   const user = new User(userId);
+  if (!(await user.isUserExists(userId))) {
+    throw new Error('User is not exists!');
+  } */
 
   const result = await User.findOneAndUpdate(
     { userId },
@@ -73,10 +85,10 @@ const addOrderIntoDB = async (userId: number, updatedFields: TOrder) => {
 
 // Fetching all orders for a specific user
 const getOrdersFromDB = async (userId: number) => {
-  const user = new User(userId);
+  /*   const user = new User(userId);
   if (!(await user.isUserExists(userId))) {
     throw new Error('User is not exists!');
-  }
+  } */
 
   const result = await User.findOne({ userId }, 'orders');
   return result;
@@ -84,10 +96,10 @@ const getOrdersFromDB = async (userId: number) => {
 
 // Calculating total cost for a single user's orders
 const getTotalPriceFromDB = async (userId: number) => {
-  const user = new User(userId);
+  /*   const user = new User(userId);
   if (!(await user.isUserExists(userId))) {
     throw new Error('User is not exists!');
-  }
+  } */
 
   const result = await User.findOne({ userId }, 'orders');
 
@@ -100,17 +112,6 @@ const getTotalPriceFromDB = async (userId: number) => {
   }, 0);
 
   return { totalPrice: totalPrice };
-};
-
-// Deleting a single user from database
-const deleteUserFromDB = async (userId: number) => {
-  const user = new User(userId);
-  if (!(await user.isUserExists(userId))) {
-    throw new Error('User is not exists!');
-  }
-
-  const result = await User.updateOne({ userId }, { isDeleted: true });
-  return result;
 };
 
 export const UserServices = {

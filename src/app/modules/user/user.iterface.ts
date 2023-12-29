@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Model } from 'mongoose';
 
 // Creating fullName type
@@ -36,12 +37,13 @@ export type TUser = {
 };
 
 // Creating an iterface for checking existing user using static
-/* export interface UserModel extends Model<TUser> {
+export interface UserModel extends Model<TUser> {
   isUserExists(userId: number): Promise<TUser | null>;
-} */
+}
 
-export type UserMethods = {
+//custom instance method
+/* export type UserMethods = {
   isUserExists(userId: number): Promise<TUser | null>;
 };
 
-export type UserModel = Model<TUser, Record<number, never>, UserMethods>;
+export type UserModel = Model<TUser, Record<number, never>, UserMethods>; */
