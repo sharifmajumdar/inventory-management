@@ -1,4 +1,5 @@
-import { Schema, model } from 'mongoose';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Schema, model, FilterQuery } from 'mongoose';
 import { TAddress, TFullName, TOrder, TUser, UserModel } from './user.iterface';
 import bcrypt from 'bcrypt';
 import config from '../../config';
@@ -124,11 +125,13 @@ const userSchema = new Schema<TUser, UserModel>({
 
 // Pre save middleware
 userSchema.pre('save', async function (next) {
-  this.password = await bcrypt.hash(
-    // Bcrypt dependency used to hash the password field
-    this.password,
-    Number(config.bcrypt_salt_rounds),
-  );
+  if (this.isNew) {
+    // Check if the document is new
+    this.password = await bcrypt.hash(
+      this.password,
+      Number(config.bcrypt_salt_rounds),
+    );
+  }
   next();
 });
 
@@ -156,23 +159,23 @@ userSchema.pre('findOneAndUpdate', function (next) {
   next();
 });
 
-// Creating custom static method for data exists
-/* userSchema.statics.isUserExists = async function (
-  userId: number,
-): Promise<boolean> {
-  try {
-    const user = await User.findOne({ userId }).exec();
-    return user ? true : false;
-  } catch (error) {
-    throw new Error('Data not found!');
-  }
-};
- */
-/* userSchema.statics.isUserExists = async function (userId: number) {
-  const existingUser = await User.findOne({ userId });
-  return existingUser;
-}; */
+// Pre query middleware for hashing password brefore update
+userSchema.pre(
+  'findOneAndUpdate',
+  async function (this: FilterQuery<UserModel>, next) {
+    const updateFields = this.getUpdate() as Partial<TUser>;
 
+    if (updateFields.password) {
+      updateFields.password = await bcrypt.hash(
+        updateFields.password,
+        Number(config.bcrypt_salt_rounds),
+      );
+    }
+    next();
+  },
+);
+
+// Creating custom static method for data exists
 userSchema.static(
   'isUserExists',
   async function isUserExists(userId: number): Promise<boolean> {
@@ -184,12 +187,5 @@ userSchema.static(
     }
   },
 );
-
-//creating a custom instance method
-/* userSchema.methods.isUserExists = async function (id: number) {
-  const existingUser = await User.findOne({ id });
-
-  return existingUser;
-}; */
 
 export const User = model<TUser, UserModel>('User', userSchema);

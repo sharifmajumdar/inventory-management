@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { UserServices } from './user.service';
-import UserValidationSchema from './user.validation';
+import { UserValidationSchema } from './user.validation';
 import { Error as MongooseError } from 'mongoose';
 import { User } from './user.model';
 import { TUser } from './user.iterface';
@@ -11,7 +11,8 @@ const createUser = async (req: Request, res: Response) => {
     const userData: TUser = req.body;
 
     // Data validation using zod
-    const zodParsedData = UserValidationSchema.parse(userData);
+    const zodParsedData =
+      UserValidationSchema.createUserValidationSchema.parse(userData);
     const result = await UserServices.createUserIntoDB(zodParsedData);
     const resData = await User.findById(result._id).select('-password'); // To skip the password field in the reponse
 
@@ -39,13 +40,31 @@ const createUser = async (req: Request, res: Response) => {
       data: responseData,
     });
   } catch (error: unknown) {
-    if (error instanceof MongooseError) {
+    if (error instanceof Error && error.message === 'User already exists!') {
+      res.status(409).json({
+        success: false,
+        message: error.message,
+        error: {
+          code: 409,
+          description: 'Conflict - User already exists!',
+        },
+      });
+    } else if (error instanceof MongooseError) {
       res.status(500).json({
         success: false,
-        message: error.message || 'User not found',
+        message: error.message || 'Internal server error',
         error: {
-          code: 404,
-          description: 'User not found!',
+          code: 500,
+          description: 'Internal server error',
+        },
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: 'Bad request',
+        error: {
+          code: 400,
+          description: 'Bad request',
         },
       });
     }
@@ -122,13 +141,31 @@ const getSingleUser = async (req: Request, res: Response) => {
       data: responseData,
     });
   } catch (error: unknown) {
-    if (error instanceof MongooseError) {
+    if (error instanceof Error && error.message === 'User not found!') {
+      res.status(409).json({
+        success: false,
+        message: error.message,
+        error: {
+          code: 409,
+          description: 'Conflict - User is not found in the database!',
+        },
+      });
+    } else if (error instanceof MongooseError) {
       res.status(500).json({
         success: false,
-        message: 'User not found',
+        message: error.message || 'Internal server error',
         error: {
-          code: 404,
-          description: 'User not found!',
+          code: 500,
+          description: 'Internal server error',
+        },
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: 'Bad request',
+        error: {
+          code: 400,
+          description: 'Bad request',
         },
       });
     }
@@ -141,7 +178,9 @@ const updatedUser = async (req: Request, res: Response) => {
     const getId = req.params.userId;
     const userId = parseInt(getId);
     const userData = req.body;
-    const result = await UserServices.updateUserInDB(userId, userData);
+    const zodParsedData =
+      UserValidationSchema.updateUserValidationSchema.parse(userData);
+    const result = await UserServices.updateUserInDB(userId, zodParsedData);
 
     const responseData = {
       userId: result?.userId,
@@ -167,13 +206,31 @@ const updatedUser = async (req: Request, res: Response) => {
       data: responseData,
     });
   } catch (error: unknown) {
-    if (error instanceof MongooseError) {
+    if (error instanceof Error && error.message === 'User not found!') {
+      res.status(409).json({
+        success: false,
+        message: error.message,
+        error: {
+          code: 409,
+          description: 'Conflict - User is not found in the database!',
+        },
+      });
+    } else if (error instanceof MongooseError) {
       res.status(500).json({
         success: false,
-        message: 'User not found',
+        message: error.message || 'Internal server error',
         error: {
-          code: 404,
-          description: 'User not found!',
+          code: 500,
+          description: 'Internal server error',
+        },
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: 'Bad request',
+        error: {
+          code: 400,
+          description: 'Bad request',
         },
       });
     }
@@ -193,13 +250,31 @@ const deleteUser = async (req: Request, res: Response) => {
       data: null,
     });
   } catch (error: unknown) {
-    if (error instanceof MongooseError) {
+    if (error instanceof Error && error.message === 'User not found!') {
+      res.status(409).json({
+        success: false,
+        message: error.message,
+        error: {
+          code: 409,
+          description: 'Conflict - User is not found in the database!',
+        },
+      });
+    } else if (error instanceof MongooseError) {
       res.status(500).json({
         success: false,
-        message: 'User not found',
+        message: error.message || 'Internal server error',
         error: {
-          code: 404,
-          description: 'User not found!',
+          code: 500,
+          description: 'Internal server error',
+        },
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: 'Bad request',
+        error: {
+          code: 400,
+          description: 'Bad request',
         },
       });
     }
@@ -212,7 +287,9 @@ const addOrders = async (req: Request, res: Response) => {
     const getId = req.params.userId;
     const userId = parseInt(getId);
     const userData = req.body;
-    await UserServices.addOrderIntoDB(userId, userData);
+    const zodParsedData =
+      UserValidationSchema.addOrdersValidationSchema.parse(userData);
+    await UserServices.addOrderIntoDB(userId, zodParsedData);
 
     res.status(200).json({
       success: true,
@@ -220,13 +297,31 @@ const addOrders = async (req: Request, res: Response) => {
       data: null,
     });
   } catch (error: unknown) {
-    if (error instanceof MongooseError) {
+    if (error instanceof Error && error.message === 'User not found!') {
+      res.status(409).json({
+        success: false,
+        message: error.message,
+        error: {
+          code: 409,
+          description: 'Conflict - User is not found in the database!',
+        },
+      });
+    } else if (error instanceof MongooseError) {
       res.status(500).json({
         success: false,
-        message: 'User not found',
+        message: error.message || 'Internal server error',
         error: {
-          code: 404,
-          description: 'User not found!',
+          code: 500,
+          description: 'Internal server error',
+        },
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: 'Bad request',
+        error: {
+          code: 400,
+          description: 'Bad request',
         },
       });
     }
@@ -253,13 +348,31 @@ const getOrders = async (req: Request, res: Response) => {
       data: resData,
     });
   } catch (error: unknown) {
-    if (error instanceof MongooseError) {
+    if (error instanceof Error && error.message === 'User not found!') {
+      res.status(409).json({
+        success: false,
+        message: error.message,
+        error: {
+          code: 409,
+          description: 'Conflict - User is not found in the database!',
+        },
+      });
+    } else if (error instanceof MongooseError) {
       res.status(500).json({
         success: false,
-        message: 'User not found',
+        message: error.message || 'Internal server error',
         error: {
-          code: 404,
-          description: 'User not found!',
+          code: 500,
+          description: 'Internal server error',
+        },
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: 'Bad request',
+        error: {
+          code: 400,
+          description: 'Bad request',
         },
       });
     }
@@ -279,13 +392,31 @@ const getTotalPrice = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error: unknown) {
-    if (error instanceof MongooseError) {
+    if (error instanceof Error && error.message === 'User not found!') {
+      res.status(409).json({
+        success: false,
+        message: error.message,
+        error: {
+          code: 409,
+          description: 'Conflict - User is not found in the database!',
+        },
+      });
+    } else if (error instanceof MongooseError) {
       res.status(500).json({
         success: false,
-        message: 'User not found',
+        message: error.message || 'Internal server error',
         error: {
-          code: 404,
-          description: 'User not found!',
+          code: 500,
+          description: 'Internal server error',
+        },
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: 'Bad request',
+        error: {
+          code: 400,
+          description: 'Bad request',
         },
       });
     }

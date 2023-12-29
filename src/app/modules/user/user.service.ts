@@ -7,7 +7,6 @@ const createUserIntoDB = async (userData: TUser) => {
   const userExists = await User.isUserExists(userData.userId);
 
   if (userExists) {
-    console.log('Data is already there!!!');
     throw new Error('User already exists!');
   }
 
@@ -23,14 +22,11 @@ const getAllUsersFromDB = async () => {
 
 // Fetching single user from database
 const getSingleUserFromDB = async (userId: number) => {
-  /*   if (!(await User.isUserExists(userId))) {
-    throw new Error('User is not exists');
-  } */
+  const userExists = await User.isUserExists(userId);
 
-  /*   const user = new User(userId);
-  if (!(await user.isUserExists(userId))) {
-    throw new Error('User is not exists!');
-  } */
+  if (!userExists) {
+    throw new Error('User not found!');
+  }
 
   const result = await User.findOne(
     { userId },
@@ -44,23 +40,28 @@ const updateUserInDB = async (
   userId: number,
   updatedFields: Partial<TUser>,
 ) => {
-  /*   const user = new User(userId);
-  if (!(await user.isUserExists(userId))) {
-    throw new Error('User is not exists!');
-  } */
+  const userExists = await User.isUserExists(userId);
 
+  if (!userExists) {
+    throw new Error('User not found!');
+  }
+
+  /*   const result = await User.findOneAndUpdate({ userId }, updatedFields, {
+    new: true,
+  }).select('-password'); */
   const result = await User.findOneAndUpdate({ userId }, updatedFields, {
     new: true,
-  }).select('-password');
+  });
   return result;
 };
 
 // Deleting a single user from database
 const deleteUserFromDB = async (userId: number) => {
-  /*   const user = new User(userId);
-  if (!(await user.isUserExists(userId))) {
-    throw new Error('User is not exists!');
-  } */
+  const userExists = await User.isUserExists(userId);
+
+  if (!userExists) {
+    throw new Error('User not found!');
+  }
 
   const result = await User.updateOne({ userId }, { isDeleted: true });
   return result;
@@ -68,10 +69,11 @@ const deleteUserFromDB = async (userId: number) => {
 
 // Appending a new order into the orders field
 const addOrderIntoDB = async (userId: number, updatedFields: TOrder) => {
-  /*   const user = new User(userId);
-  if (!(await user.isUserExists(userId))) {
-    throw new Error('User is not exists!');
-  } */
+  const userExists = await User.isUserExists(userId);
+
+  if (!userExists) {
+    throw new Error('User not found!');
+  }
 
   const result = await User.findOneAndUpdate(
     { userId },
@@ -85,10 +87,11 @@ const addOrderIntoDB = async (userId: number, updatedFields: TOrder) => {
 
 // Fetching all orders for a specific user
 const getOrdersFromDB = async (userId: number) => {
-  /*   const user = new User(userId);
-  if (!(await user.isUserExists(userId))) {
-    throw new Error('User is not exists!');
-  } */
+  const userExists = await User.isUserExists(userId);
+
+  if (!userExists) {
+    throw new Error('User not found!');
+  }
 
   const result = await User.findOne({ userId }, 'orders');
   return result;
@@ -96,10 +99,11 @@ const getOrdersFromDB = async (userId: number) => {
 
 // Calculating total cost for a single user's orders
 const getTotalPriceFromDB = async (userId: number) => {
-  /*   const user = new User(userId);
-  if (!(await user.isUserExists(userId))) {
-    throw new Error('User is not exists!');
-  } */
+  const userExists = await User.isUserExists(userId);
+
+  if (!userExists) {
+    throw new Error('User not found!');
+  }
 
   const result = await User.findOne({ userId }, 'orders');
 

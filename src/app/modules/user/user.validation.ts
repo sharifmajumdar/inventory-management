@@ -26,7 +26,7 @@ const OrderValidationSchema = z.object({
   quantity: z.number().min(1).optional(),
 });
 
-const UserValidationSchema = z.object({
+const createUserValidationSchema = z.object({
   userId: z.number().min(1),
   username: z.string().min(1).max(20),
   password: z.string().min(1),
@@ -40,4 +40,28 @@ const UserValidationSchema = z.object({
   isDeleted: z.boolean().optional(),
 });
 
-export default UserValidationSchema;
+const updateUserValidationSchema = z.object({
+  userId: z.number().min(1).optional(),
+  username: z.string().min(1).max(20).optional(),
+  password: z.string().min(1).optional(),
+  fullName: FullNameValidationSchema.optional(),
+  age: z.number().min(1).optional(),
+  email: z.string().email().optional(),
+  isActive: z.boolean().optional(),
+  hobbies: z.array(z.string().min(1)).optional(),
+  address: AddressValidationSchema.optional(),
+  orders: z.array(OrderValidationSchema).optional(),
+  isDeleted: z.boolean().optional(),
+});
+
+const addOrdersValidationSchema = z.object({
+  productName: z.string().optional(),
+  price: z.number().min(1).optional(),
+  quantity: z.number().min(1).optional(),
+});
+
+export const UserValidationSchema = {
+  createUserValidationSchema,
+  updateUserValidationSchema,
+  addOrdersValidationSchema,
+};
